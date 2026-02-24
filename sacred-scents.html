@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sacred Scents — An Aromatic Atlas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --obsidian: #0d0a07;
+    --deep-ember: #1a110a;
+    --amber: #c8832a;
+    --gold: #e8b86d;
+    --pale-gold: #f2d9a0;
+    --cream: #f5ead5;
+    --smoke: rgba(200,131,42,0.08);
+    --border: rgba(200,131,42,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 20% 50%, rgba(139,69,19,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 30%, rgba(200,131,42,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 90%, rgba(100,40,10,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,131,42,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%,-50%) scale(1.15); opacity: 1; }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+    position: relative; z-index: 1;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 0.95;
+    color: var(--pale-gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+    position: relative; z-index: 1;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: rgba(245,234,213,0.55);
+    max-width: 480px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+    position: relative; z-index: 1;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--amber);
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    opacity: 0;
+    animation: fadeUp 1s 1.2s forwards;
+    z-index: 1;
+  }
+
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    animation: drip 2s ease-in-out infinite;
+  }
+
+  @keyframes drip {
+    0%,100% { transform: scaleY(1); opacity: 1; }
+    50% { transform: scaleY(0.6); opacity: 0.4; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* NAV */
+  .scent-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: rgba(13,10,7,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1rem;
+  }
+
+  .scent-nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: rgba(245,234,213,0.45);
+    text-decoration: none;
+    padding: 1.1rem 1.2rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .scent-nav a:hover, .scent-nav a.active {
+    color: var(--gold);
+    border-bottom-color: var(--amber);
+  }
+
+  /* SCENT SECTIONS */
+  .scent-section {
+    position: relative;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 768px) {
+    .scent-section { grid-template-columns: 1fr; }
+  }
+
+  .scent-section:nth-child(even) .visual-col { order: 2; }
+  .scent-section:nth-child(even) .content-col { order: 1; }
+
+  @media (max-width: 768px) {
+    .scent-section:nth-child(even) .visual-col,
+    .scent-section:nth-child(even) .content-col { order: unset; }
+  }
+
+  .visual-col {
+    position: relative;
+    overflow: hidden;
+    min-height: 50vh;
+  }
+
+  .visual-col .bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 8s ease;
+  }
+
+  .scent-section:hover .visual-col .bg { transform: scale(1.04); }
+
+  .visual-col .symbol {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9rem;
+    opacity: 0.22;
+    filter: blur(1px);
+    z-index: 1;
+  }
+
+  .visual-col .number {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 2rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    font-weight: 700;
+    font-style: italic;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    z-index: 1;
+  }
+
+  .visual-col .name-overlay {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.4);
+    z-index: 2;
+    font-style: italic;
+  }
+
+  /* Per-scent colors */
+  .oudh .bg { background: radial-gradient(ellipse at 40% 60%, #3d1a08 0%, #1a0a04 50%, #0d0705 100%); }
+  .sandalwood .bg { background: radial-gradient(ellipse at 60% 40%, #2e1f0e 0%, #1a1208 50%, #0d0a05 100%); }
+  .palo-santo .bg { background: radial-gradient(ellipse at 30% 70%, #1a2214 0%, #0f160c 50%, #090d07 100%); }
+  .regal-copal .bg { background: radial-gradient(ellipse at 70% 30%, #261a06 0%, #16100c 50%, #0d0a07 100%); }
+  .arruda .bg { background: radial-gradient(ellipse at 50% 50%, #0e1f0a 0%, #0a150a 50%, #070d07 100%); }
+  .musk .bg { background: radial-gradient(ellipse at 30% 60%, #1a0f1a 0%, #100810 50%, #0a070a 100%); }
+
+  .content-col {
+    padding: 5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-left: 1px solid var(--border);
+    position: relative; z-index: 1;
+  }
+
+  @media (max-width: 768px) {
+    .content-col { padding: 3rem 1.8rem; border-left: none; border-top: 1px solid var(--border); }
+  }
+
+  .scent-number {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--amber);
+    margin-bottom: 0.75rem;
+  }
+
+  .scent-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--pale-gold);
+    line-height: 1.1;
+    margin-bottom: 0.3rem;
+  }
+
+  .scent-origin {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    color: rgba(245,234,213,0.3);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(to right, var(--amber), transparent);
+    margin-bottom: 2rem;
+  }
+
+  .scent-desc {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: rgba(245,234,213,0.72);
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .scent-desc em { font-style: italic; color: var(--gold); }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .profile-item label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.3em;
+    color: var(--amber);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+  }
+
+  .profile-item p {
+    font-size: 0.88rem;
+    color: rgba(245,234,213,0.6);
+    line-height: 1.5;
+  }
+
+  .intensity-section { margin-bottom: 2.5rem; }
+
+  .intensity-section > label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.3em;
+    color: var(--amber);
+    margin-bottom: 0.85rem;
+    text-transform: uppercase;
+  }
+
+  .trait-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .trait-row span:first-child {
+    font-size: 0.78rem;
+    color: rgba(245,234,213,0.45);
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .bar-track {
+    flex: 1; height: 2px;
+    background: rgba(200,131,42,0.12);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--amber), var(--gold));
+    width: 0;
+    transition: width 1.4s cubic-bezier(0.25,1,0.5,1);
+  }
+
+  .trait-row span:last-child {
+    font-size: 0.7rem;
+    color: rgba(245,234,213,0.3);
+    width: 25px;
+    text-align: right;
+  }
+
+  .variations-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.35em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 0.9rem;
+  }
+
+  .variations-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .var-tag {
+    font-size: 0.78rem;
+    color: rgba(245,234,213,0.5);
+    border: 1px solid rgba(200,131,42,0.18);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    cursor: default;
+    transition: all 0.25s;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  .var-tag:hover {
+    color: var(--gold);
+    border-color: var(--amber);
+    background: rgba(200,131,42,0.07);
+  }
+
+  /* COMPARISON */
+  .comparison-section {
+    padding: 8rem 4rem;
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) { .comparison-section { padding: 4rem 1rem; } }
+
+  .section-heading {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-heading h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--pale-gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-heading p {
+    color: rgba(245,234,213,0.35);
+    font-size: 0.82rem;
+    letter-spacing: 0.15em;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .compare-table th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.3em;
+    color: var(--amber);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(200,131,42,0.07);
+    color: rgba(245,234,213,0.6);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .compare-table td:first-child {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--pale-gold);
+    font-size: 1.05rem;
+    white-space: nowrap;
+  }
+
+  .compare-table tr:hover td { background: rgba(200,131,42,0.04); }
+
+  .dot-row { display: flex; gap: 3px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(200,131,42,0.15); }
+  .dot.filled { background: var(--amber); }
+
+  /* PAIRINGS */
+  .pairing-section {
+    padding: 6rem 4rem;
+    border-top: 1px solid var(--border);
+    position: relative; z-index: 1;
+  }
+
+  @media (max-width: 768px) { .pairing-section { padding: 4rem 1.5rem; } }
+
+  .pairing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 3rem;
+  }
+
+  .pairing-card {
+    background: var(--obsidian);
+    padding: 2.5rem 2rem;
+    transition: background 0.3s;
+  }
+
+  .pairing-card:hover { background: var(--deep-ember); }
+
+  .pairing-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+
+  .pairing-card p {
+    font-size: 0.85rem;
+    color: rgba(245,234,213,0.45);
+    line-height: 1.75;
+  }
+
+  footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+    color: rgba(245,234,213,0.18);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    font-family: 'Cinzel', serif;
+    position: relative; z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <p class="hero-eyebrow">An Aromatic Atlas</p>
+  <h1 class="hero-title">Sacred<br>Scents</h1>
+  <p class="hero-sub">Six resins, woods, and essences revered across millennia — their origins, character, and the worlds they carry within them.</p>
+  <div class="scroll-hint">Explore</div>
+</section>
+
+<nav class="scent-nav">
+  <a href="#oudh">Oudh</a>
+  <a href="#sandalwood">Sandalwood</a>
+  <a href="#palo-santo">Palo Santo</a>
+  <a href="#regal-copal">Regal Copal</a>
+  <a href="#arruda">Arruda</a>
+  <a href="#musk">Musk</a>
+  <a href="#compare">Compare</a>
+</nav>
+
+<!-- 01 OUDH -->
+<section class="scent-section oudh" id="oudh">
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">🌿</div>
+    <div class="number">01</div>
+    <div class="name-overlay">Aquilaria / Gyrinops</div>
+  </div>
+  <div class="content-col">
+    <p class="scent-number">— 01 / 06</p>
+    <h2 class="scent-title">Oudh</h2>
+    <p class="scent-origin">Southeast Asia · Middle East · South Asia</p>
+    <div class="divider"></div>
+    <p class="scent-desc">Oudh — also written oud or agarwood — is the infected heartwood of <em>Aquilaria</em> trees, produced when the tree mounts a defense against the mould <em>Phialophora parasitica</em>. The dark resinous wood that results is among the most expensive natural materials on Earth, sometimes worth more than gold by weight. Its scent is labyrinthine: barnyard leather, dark honey, incense smoke, and humid forest floor folded into something simultaneously ancient and intimate.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Infected heartwood of Aquilaria &amp; Gyrinops trees</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>India, Cambodia, Vietnam, Laos, Borneo, Arabian Peninsula</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Woody · Animalic · Resinous · Smoky</p></div>
+      <div class="profile-item"><label>Used In</label><p>Incense, perfumery, traditional medicine, sacred rites</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="95"></div></div><span>95</span></div>
+      <div class="trait-row"><span>Sweetness</span><div class="bar-track"><div class="bar-fill" data-w="45"></div></div><span>45</span></div>
+      <div class="trait-row"><span>Smokiness</span><div class="bar-track"><div class="bar-fill" data-w="70"></div></div><span>70</span></div>
+      <div class="trait-row"><span>Longevity</span><div class="bar-track"><div class="bar-fill" data-w="98"></div></div><span>98</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="85"></div></div><span>85</span></div>
+    </div>
+    <p class="variations-title">Notable Varieties</p>
+    <div class="variations-list">
+      <span class="var-tag">Hindi (India) — pungent, barnyard</span>
+      <span class="var-tag">Cambodi — sweet, fruity</span>
+      <span class="var-tag">Malay / Borneo — dark, medicinal</span>
+      <span class="var-tag">Sri Lankan — floral, delicate</span>
+      <span class="var-tag">Papuan — leathery, smoky</span>
+      <span class="var-tag">Assam — rich, complex</span>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SANDALWOOD -->
+<section class="scent-section sandalwood" id="sandalwood">
+  <div class="content-col">
+    <p class="scent-number">— 02 / 06</p>
+    <h2 class="scent-title">Sandalwood</h2>
+    <p class="scent-origin">India · Australia · Indonesia · Pacific Islands</p>
+    <div class="divider"></div>
+    <p class="scent-desc">Sandalwood is the heartwood of <em>Santalum</em> — slow-growing, semi-parasitic trees that attach their roots to neighboring plants for nutrients. The oil distilled from the heartwood is creamy, milky, enveloping: soft wood, warm skin, a whisper of vanilla and beeswax. Unlike most scents, sandalwood does not confront — it meditates. It is among the oldest known perfumery materials, used continuously for over 4,000 years across Hindu, Buddhist, and Ayurvedic traditions.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Heartwood &amp; roots of Santalum album, S. spicatum, S. paniculatum</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>Mysore (India), Western Australia, New Caledonia, Vanuatu</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Creamy Woody · Milky · Balsamic · Soft</p></div>
+      <div class="profile-item"><label>Used In</label><p>Hindu &amp; Buddhist ritual, Ayurveda, perfumery, incense</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="70"></div></div><span>70</span></div>
+      <div class="trait-row"><span>Sweetness</span><div class="bar-track"><div class="bar-fill" data-w="65"></div></div><span>65</span></div>
+      <div class="trait-row"><span>Smokiness</span><div class="bar-track"><div class="bar-fill" data-w="20"></div></div><span>20</span></div>
+      <div class="trait-row"><span>Longevity</span><div class="bar-track"><div class="bar-fill" data-w="90"></div></div><span>90</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="35"></div></div><span>35</span></div>
+    </div>
+    <p class="variations-title">Notable Varieties</p>
+    <div class="variations-list">
+      <span class="var-tag">Mysore / S. album — the gold standard</span>
+      <span class="var-tag">Australian (S. spicatum) — drier, woody</span>
+      <span class="var-tag">Hawaiian (S. paniculatum) — delicate, floral</span>
+      <span class="var-tag">Vanuatu — rich, creamy</span>
+      <span class="var-tag">New Caledonian — earthy, green</span>
+    </div>
+  </div>
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">🪵</div>
+    <div class="number">02</div>
+    <div class="name-overlay">Santalum album / spicatum</div>
+  </div>
+</section>
+
+<!-- 03 PALO SANTO -->
+<section class="scent-section palo-santo" id="palo-santo">
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">🌲</div>
+    <div class="number">03</div>
+    <div class="name-overlay">Bursera graveolens</div>
+  </div>
+  <div class="content-col">
+    <p class="scent-number">— 03 / 06</p>
+    <h2 class="scent-title">Palo Santo</h2>
+    <p class="scent-origin">Ecuador · Peru · Venezuela · Mexico</p>
+    <div class="divider"></div>
+    <p class="scent-desc">"Holy wood" in Spanish. <em>Bursera graveolens</em> only releases its full aromatic potential after the tree has died naturally and lain on the forest floor for three to five years. Shamans of Andean and Amazonian traditions have burned it for millennia to clear negative energy, invite spirits, and purify spaces. Its smoke is bright and citrusy — pine resin crossed with lemon, mint, and a base of warm balsam. Simultaneously uplifting and grounding, it is instantly recognizable.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Naturally dead heartwood of Bursera graveolens; oil &amp; resin</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>Ecuador's coastal dry forests, Peruvian Amazon, Yucatán (Mexico)</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Citrusy · Resinous · Fresh · Slightly Sweet</p></div>
+      <div class="profile-item"><label>Used In</label><p>Shamanic cleansing, meditation, aromatherapy, artisan perfumery</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="55"></div></div><span>55</span></div>
+      <div class="trait-row"><span>Sweetness</span><div class="bar-track"><div class="bar-fill" data-w="60"></div></div><span>60</span></div>
+      <div class="trait-row"><span>Smokiness</span><div class="bar-track"><div class="bar-fill" data-w="65"></div></div><span>65</span></div>
+      <div class="trait-row"><span>Longevity</span><div class="bar-track"><div class="bar-fill" data-w="55"></div></div><span>55</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="45"></div></div><span>45</span></div>
+    </div>
+    <p class="variations-title">Forms &amp; Regional Differences</p>
+    <div class="variations-list">
+      <span class="var-tag">Ecuadorian sticks — sweeter, citrus-forward</span>
+      <span class="var-tag">Peruvian sticks — earthier, deeper resin</span>
+      <span class="var-tag">Essential oil — concentrated, diffuser-ready</span>
+      <span class="var-tag">Resin chips — slow smolder, intense</span>
+      <span class="var-tag">Mexican variant — rare, hybrid character</span>
+    </div>
+  </div>
+</section>
+
+<!-- 04 REGAL COPAL -->
+<section class="scent-section regal-copal" id="regal-copal">
+  <div class="content-col">
+    <p class="scent-number">— 04 / 06</p>
+    <h2 class="scent-title">Regal Copal</h2>
+    <p class="scent-origin">Mexico · Guatemala · Central America</p>
+    <div class="divider"></div>
+    <p class="scent-desc">Copal is a broad name for tree resins used ritually throughout Mesoamerica, from the Nahuatl <em>copalli</em> ("incense"). Regal Copal refers to higher-grade or aged copals — often white or black — burned by the Aztecs and Maya as offerings to the gods. The scent is clean and cathedral-like: sharp lemony citrus top notes, a piney middle, and a dry, slightly sweet base that lingers like incense in old stone. It is the backbone of Día de los Muertos altars and Catholic-syncretic church ceremony alike.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Resin of Bursera species (white/black/gold copal), Protium copal</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>Oaxaca &amp; Chiapas (Mexico), Guatemala highlands, Belize</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Resinous · Citrusy-Pine · Bright · Sacred-Dry</p></div>
+      <div class="profile-item"><label>Used In</label><p>Aztec &amp; Maya ceremony, Día de los Muertos, syncretic churches</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="60"></div></div><span>60</span></div>
+      <div class="trait-row"><span>Sweetness</span><div class="bar-track"><div class="bar-fill" data-w="38"></div></div><span>38</span></div>
+      <div class="trait-row"><span>Smokiness</span><div class="bar-track"><div class="bar-fill" data-w="55"></div></div><span>55</span></div>
+      <div class="trait-row"><span>Longevity</span><div class="bar-track"><div class="bar-fill" data-w="60"></div></div><span>60</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="40"></div></div><span>40</span></div>
+    </div>
+    <p class="variations-title">Copal Types</p>
+    <div class="variations-list">
+      <span class="var-tag">White Copal — clean, bright, sacred</span>
+      <span class="var-tag">Black Copal — dark, intense, protective</span>
+      <span class="var-tag">Gold Copal — amber-hued, balsamic</span>
+      <span class="var-tag">Pom (Maya) — strong, green, resinous</span>
+      <span class="var-tag">Santo Domingo — aged, rare, complex</span>
+    </div>
+  </div>
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">🫙</div>
+    <div class="number">04</div>
+    <div class="name-overlay">Bursera / Protium copali</div>
+  </div>
+</section>
+
+<!-- 05 ARRUDA -->
+<section class="scent-section arruda" id="arruda">
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">🌱</div>
+    <div class="number">05</div>
+    <div class="name-overlay">Ruta graveolens</div>
+  </div>
+  <div class="content-col">
+    <p class="scent-number">— 05 / 06</p>
+    <h2 class="scent-title">Arruda</h2>
+    <p class="scent-origin">Mediterranean · Iberia · Brazil · West Africa</p>
+    <div class="divider"></div>
+    <p class="scent-desc">Arruda is the Portuguese name for <em>Ruta graveolens</em> — Common Rue — a bitter herb used since ancient Rome, where it was called the "herb of grace." Across Brazilian Candomblé, Portuguese folk magic, and Mediterranean traditions it is the foremost plant of spiritual protection, believed to repel the evil eye, negative spirits, and illness. Its scent is sharp, green, camphoraceous, and medicinal — deeply herbal with an almost fungal bitterness. Unlike the others here, arruda confronts rather than seduces.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Leaves, stems &amp; roots of Ruta graveolens (Common Rue)</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>Brazil (Bahia), Portugal, North Africa, Southern Europe</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Herbal · Bitter-Green · Camphoraceous · Medicinal</p></div>
+      <div class="profile-item"><label>Used In</label><p>Spiritual cleansing (limpeza), evil-eye protection, Candomblé ritual, folk medicine</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="40"></div></div><span>40</span></div>
+      <div class="trait-row"><span>Sharpness</span><div class="bar-track"><div class="bar-fill" data-w="90"></div></div><span>90</span></div>
+      <div class="trait-row"><span>Smokiness</span><div class="bar-track"><div class="bar-fill" data-w="10"></div></div><span>10</span></div>
+      <div class="trait-row"><span>Bitterness</span><div class="bar-track"><div class="bar-fill" data-w="85"></div></div><span>85</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="55"></div></div><span>55</span></div>
+    </div>
+    <p class="variations-title">Forms &amp; Traditions</p>
+    <div class="variations-list">
+      <span class="var-tag">Fresh branches — most pungent, ritual bath</span>
+      <span class="var-tag">Dried bundles — hung for protection</span>
+      <span class="var-tag">Essential oil — rare, toxic in large doses</span>
+      <span class="var-tag">Ruta chalepensis — milder North African variety</span>
+      <span class="var-tag">Água de Arruda — infused water for blessing</span>
+    </div>
+  </div>
+</section>
+
+<!-- 06 MUSK -->
+<section class="scent-section musk" id="musk">
+  <div class="content-col">
+    <p class="scent-number">— 06 / 06</p>
+    <h2 class="scent-title">Musk</h2>
+    <p class="scent-origin">Himalaya · China · Siberia · Laboratory</p>
+    <div class="divider"></div>
+    <p class="scent-desc">True musk was once harvested from the gland of the endangered <em>Moschus moschiferus</em> — a deeply animalic and carnal material that acts as a fixative, binding other fragrances and extending their life on skin. It smells of warm skin, animal warmth, damp earth, and biology. Today virtually all musk in perfumery is synthetic — white musks (clean, laundry-like), polycyclic musks, and macrocyclic musks each capture a facet of the original. Encounter a natural musk pod and it is overwhelming, transformative at a biological level.</p>
+    <div class="profile-grid">
+      <div class="profile-item"><label>Source</label><p>Natural: musk pod gland of Moschus deer. Modern: synthetic nitro, polycyclic &amp; macrocyclic molecules</p></div>
+      <div class="profile-item"><label>Primary Regions</label><p>Himalayan Nepal &amp; Tibet (natural); synthesized globally</p></div>
+      <div class="profile-item"><label>Scent Family</label><p>Animalic · Warm · Skin-like · Fixative</p></div>
+      <div class="profile-item"><label>Used In</label><p>Virtually all modern perfumery as base &amp; fixative; incense, traditional medicine</p></div>
+    </div>
+    <div class="intensity-section">
+      <label>Aromatic Profile</label>
+      <div class="trait-row"><span>Depth</span><div class="bar-track"><div class="bar-fill" data-w="88"></div></div><span>88</span></div>
+      <div class="trait-row"><span>Sweetness</span><div class="bar-track"><div class="bar-fill" data-w="30"></div></div><span>30</span></div>
+      <div class="trait-row"><span>Animalic</span><div class="bar-track"><div class="bar-fill" data-w="95"></div></div><span>95</span></div>
+      <div class="trait-row"><span>Longevity</span><div class="bar-track"><div class="bar-fill" data-w="99"></div></div><span>99</span></div>
+      <div class="trait-row"><span>Earthiness</span><div class="bar-track"><div class="bar-fill" data-w="60"></div></div><span>60</span></div>
+    </div>
+    <p class="variations-title">Musk Types</p>
+    <div class="variations-list">
+      <span class="var-tag">Natural musk pod — raw, animalistic, rare</span>
+      <span class="var-tag">White musk — clean, fresh, synthetic</span>
+      <span class="var-tag">Black musk — dark, leathery, smoky</span>
+      <span class="var-tag">Macrocyclic musks — closest to natural</span>
+      <span class="var-tag">Ambrette — vegetable musk, ethical</span>
+      <span class="var-tag">Tonkin musk — classical fine-perfume standard</span>
+    </div>
+  </div>
+  <div class="visual-col">
+    <div class="bg"></div>
+    <div class="symbol">✦</div>
+    <div class="number">06</div>
+    <div class="name-overlay">Moschus moschiferus / Synthetic</div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="comparison-section" id="compare">
+  <div class="section-heading">
+    <h2>Side by Side</h2>
+    <p>A comparative overview of all six sacred scents</p>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Scent</th>
+          <th>Botanical Source</th>
+          <th>Character</th>
+          <th>Tradition</th>
+          <th>Intensity</th>
+          <th>Rarity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Oudh</td>
+          <td>Infected Aquilaria heartwood</td>
+          <td>Dark, animalic, leather, honey, smoke</td>
+          <td>Arabian, South &amp; SE Asian</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div></td>
+        </tr>
+        <tr>
+          <td>Sandalwood</td>
+          <td>Santalum heartwood &amp; oil</td>
+          <td>Creamy, milky, soft wood, skin-warm</td>
+          <td>Hindu, Buddhist, Ayurvedic</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div></td>
+        </tr>
+        <tr>
+          <td>Palo Santo</td>
+          <td>Naturally dead Bursera wood</td>
+          <td>Citrus-pine, bright, sweet smoke</td>
+          <td>Andean, Amazonian shamanic</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td>
+        </tr>
+        <tr>
+          <td>Regal Copal</td>
+          <td>Tree resin (Bursera / Protium)</td>
+          <td>Bright, lemony, piney, cathedral-dry</td>
+          <td>Aztec, Maya, Catholic (syncretic)</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div></td>
+        </tr>
+        <tr>
+          <td>Arruda</td>
+          <td>Ruta graveolens (herb)</td>
+          <td>Sharp, bitter-green, camphor, medicinal</td>
+          <td>Brazilian, Portuguese, Mediterranean folk</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td>
+        </tr>
+        <tr>
+          <td>Musk</td>
+          <td>Deer pod gland / synthetic</td>
+          <td>Animalic, skin-warm, earthy, fixative</td>
+          <td>Universal — used in all traditions</td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div></td>
+          <td><div class="dot-row"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PAIRINGS -->
+<section class="pairing-section">
+  <div class="section-heading">
+    <h2>The Art of Pairing</h2>
+    <p>How these scents harmonize when combined</p>
+  </div>
+  <div class="pairing-grid">
+    <div class="pairing-card">
+      <h3>Oudh + Sandalwood</h3>
+      <p>The darkest wood meets the creamiest. Oudh's barnyard animalic is softened and elevated by sandalwood's milky warmth — a foundation used in countless Middle Eastern and Indian attars for centuries.</p>
+    </div>
+    <div class="pairing-card">
+      <h3>Palo Santo + Regal Copal</h3>
+      <p>Two Mesoamerican resins, cousins in spirit. Together they build a full shamanic cathedral smoke — palo santo's citrus brightness lifts copal's piney depth into something transcendent.</p>
+    </div>
+    <div class="pairing-card">
+      <h3>Sandalwood + Musk</h3>
+      <p>The backbone of modern Western perfumery. Sandalwood adds creaminess and diffusion; musk anchors and extends everything to skin — a pairing found in thousands of fine fragrances.</p>
+    </div>
+    <div class="pairing-card">
+      <h3>Arruda + Copal</h3>
+      <p>Protection rituals in the Afro-Brazilian tradition combine the sharp bitterness of rue with the sacred smoke of copal, creating a powerful cleansing atmosphere believed to purify space of all negativity.</p>
+    </div>
+    <div class="pairing-card">
+      <h3>Oudh + Musk</h3>
+      <p>Two animalic titans. This sits at the heart of many Arabian oud perfumes — the complexity of infected wood amplified and fixed by musk's skin-binding quality. Deep, primordial, unforgettable.</p>
+    </div>
+    <div class="pairing-card">
+      <h3>Palo Santo + Sandalwood</h3>
+      <p>Light and gentle: the fresh resinous sweetness of palo santo blended with sandalwood's creamy softness creates an accessible, meditative blend — one of the most approachable combinations here.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Sacred Scents — An Aromatic Atlas &nbsp;·&nbsp; Exploring the world's most ancient aromatics
+</footer>
+
+<script>
+  // Animate bars on scroll
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.bar-fill').forEach(fill => {
+          setTimeout(() => { fill.style.width = fill.getAttribute('data-w') + '%'; }, 150);
+        });
+        barObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.25 });
+
+  document.querySelectorAll('.scent-section').forEach(s => barObserver.observe(s));
+
+  // Nav active state
+  const navLinks = document.querySelectorAll('.scent-nav a');
+  const sections = document.querySelectorAll('section[id]');
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.scent-nav a[href="#${entry.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-35% 0px -35% 0px' });
+
+  sections.forEach(s => sectionObserver.observe(s));
+</script>
+</body>
+</html>
